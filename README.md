@@ -11,6 +11,6 @@ Usage: <br>
 3. Paste in http://firebottle.tv/support-alert/support.html?username=YOURNAMEHERE&timer=8000&command=support <br>
 4. Change out your name in the url.
 
-Settings:
-1. You can change the timer to adjust how long the support popup shows. 1000 = 1 second.
+Settings: <br>
+1. You can change the timer to adjust how long the support popup shows. 1000 = 1 second. <br>
 2. You can change the command in the URL if your shoutout command isn't !support.

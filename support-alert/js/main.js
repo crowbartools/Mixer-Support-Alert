@@ -18,9 +18,9 @@ var getUrlParameter = function getUrlParameter(sParam) {
 
 // Get User ID & start it up
 var username = getUrlParameter('username');
-$.getJSON( "https://beam.pro/api/v1/channels/"+username, function( data ) {
+$.getJSON( "https://Mixer.com/api/v1/channels/"+username, function( data ) {
   userID = data.id;
-  beamSocketConnect();
+  mixerSocketConnect();
 });
 
 // General Settings
@@ -30,12 +30,12 @@ command = getUrlParameter('command');
 console.log(command);
 
 // CHAT
-// Connect to Beam Websocket
-function beamSocketConnect(){
+// Connect to mixer Websocket
+function mixerSocketConnect(){
     if ("WebSocket" in window){
 
        // Let us open a web socket
-       var ws = new ReconnectingWebSocket("wss://chat2-dal.beam.pro:443");
+       var ws = new ReconnectingWebSocket("wss://chat2-dal.Mixer.com:443");
 
        ws.onopen = function(){
           // Web Socket is connected, send data using send()
@@ -103,16 +103,16 @@ function chat(evt){
           var raidEditFinal = $.trim(raidEditTwo);
 
           if(raidEditFinal !== undefined && raidEditFinal !== null && raidEditFinal !== ""){
-            $.getJSON( "https://beam.pro/api/v1/channels/"+raidEditFinal, function( data ) {
+            $.getJSON( "https://Mixer.com/api/v1/channels/"+raidEditFinal, function( data ) {
               var userID = data.id;
               var userAvatar = data.user.avatarUrl;
               var userGroup = data.user.groups[0].name;
               console.log(userAvatar);
               if(userAvatar == null || userAvatar == "null"){
-                var userAvatar = "http://beam.pro/api/v1/users/62319/avatar?w=256&h=256&v=0";
+                var userAvatar = "http://Mixer.com/api/v1/users/62319/avatar?w=256&h=256&v=0";
               }
               
-              $("<div class='raidmessage'><div class='avatar'><img src='"+userAvatar+"'></div><div class='username' role="+userGroup+">"+raidEditFinal+"</div><div class='beamurl'>beam.pro/"+raidEditFinal+"</div></div>").appendTo(".raid").hide().fadeIn('fast').delay(timeToShow).fadeOut('fast', function(){ $(this).remove(); });
+              $("<div class='raidmessage'><div class='avatar'><img src='"+userAvatar+"'></div><div class='username' role="+userGroup+">"+raidEditFinal+"</div><div class='mixerurl'>Mixer.com/"+raidEditFinal+"</div></div>").appendTo(".raid").hide().fadeIn('fast').delay(timeToShow).fadeOut('fast', function(){ $(this).remove(); });
 
             });
           }

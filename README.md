@@ -1,7 +1,7 @@
-# Beam-Support-Alert
-An overlay for your !support command. A better way to shout out beam streamers!
+# mixer-Support-Alert
+An overlay for your !support command. A better way to shout out mixer streamers!
 
-This will display a popup on your stream with the beam.pro avatar, their name, and a link for the person you are giving shoutouts to. This will display when a mod or the streamer in chat uses your !support PERSON command. The command itself can be changed in the URL to be anything other than !support. 
+This will display a popup on your stream with the Mixer.com avatar, their name, and a link for the person you are giving shoutouts to. This will display when a mod or the streamer in chat uses your !support PERSON command. The command itself can be changed in the URL to be anything other than !support. 
 
 Note this will not post anything in chat. So please use this in conjuction with a bot.
 

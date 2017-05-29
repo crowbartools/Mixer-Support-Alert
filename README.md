@@ -8,7 +8,7 @@ Note this will not post anything in chat. So please use this in conjuction with 
 Usage: <br>
 1. Open up OBS. <br>
 2. Create a new browser overlay element. <br>
-3. Paste in http://firebottle.tv/support-alert/support.html?username=YOURNAMEHERE&timer=8000&command=support <br>
+3. Paste in http://firebottle.tv/projects/support-alert/support.html?username=YOURNAMEHERE&timer=8000&command=support <br>
 4. Change out your name in the url.
 
 Settings: <br>

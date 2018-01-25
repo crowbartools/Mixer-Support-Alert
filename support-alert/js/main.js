@@ -97,7 +97,7 @@ function chat(evt){
 
         // Make sure command came from a user or owner.
         // Then take thank name and post a message.
-        if(userroles == "Mod" && completeMessage.indexOf("!"+command) >= 0 || userroles == "Owner" && completeMessage.indexOf("!"+command) >= 0){
+        if(userroles == "Mod" && completeMessage.indexOf("!"+command) >= 0 || userroles == "ChannelEditor" && completeMessage.indexOf("!"+command) >= 0 || userroles == "Owner" && completeMessage.indexOf("!"+command) >= 0){
           var raidEditOne = completeMessage.replace("!"+command, "");
           var raidEditTwo = raidEditOne.replace("@","");
           var raidEditFinal = $.trim(raidEditTwo);
@@ -106,8 +106,37 @@ function chat(evt){
             $.getJSON( "https://Mixer.com/api/v1/channels/"+raidEditFinal, function( data ) {
               var userID = data.id;
               var userAvatar = data.user.avatarUrl;
-              var userGroup = data.user.groups[0].name;
-              console.log(userAvatar);
+              var userGroups = data.user.groups;
+              var userGroup = "User";
+              
+              for(i in userGroups){
+                let group = userGroups[i];
+                let groupName = group.name;
+                
+                switch(groupName) {
+                  case "Pro":
+                    userGroup = "Pro";
+                  break;
+                  case "Subscriber":
+                    userGroup = "Subscriber";
+                  break;
+                  case "Mod":
+                  case "ChannelEditor":
+                  case "Channel Editor":
+                    userGroup = "Mod";
+                  break;
+                  case "Staff":
+                    userGroup = "Staff";
+                  break;
+                  case "Owner":
+                    userGroup = "Owner";
+                  break;
+                  default:
+                    userGroup = "User";
+                }
+
+              }
+
               if(userAvatar == null || userAvatar == "null"){
                 var userAvatar = "http://Mixer.com/api/v1/users/62319/avatar?w=256&h=256&v=0";
               }

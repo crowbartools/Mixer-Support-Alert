@@ -51,7 +51,7 @@ html, body{
 .username[role=Pro]{
 	color: #b143d1;
 }
-.username[role=Mod]{
+.username[role=Mod], .username[role=ChannelEditor]{
 	color: #36e53a;
 }
 .username[role=Subscriber]{

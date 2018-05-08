@@ -140,8 +140,26 @@ function chat(evt){
               if(userAvatar == null || userAvatar == "null"){
                 var userAvatar = "http://Mixer.com/api/v1/users/62319/avatar?w=256&h=256&v=0";
               }
-              
-              $("<div class='raidmessage'><div class='avatar'><img src='"+userAvatar+"'></div><div class='username' role="+userGroup+">"+raidEditFinal+"</div><div class='mixerurl'>Mixer.com/"+raidEditFinal+"</div></div>").appendTo(".raid").hide().fadeIn('fast').delay(timeToShow).fadeOut('fast', function(){ $(this).remove(); });
+
+              let template = `
+                <div class='raidmessage'>
+                  <div class='avatar'>
+                    <img src="${userAvatar}">
+                  </div>
+                  <div class="username" role="${userGroup}">
+                    ${raidEditFinal}
+                  </div>
+                  <div class='mixerurl'>
+                    mixer.com/${raidEditFinal}
+                  </div>
+                </div>
+              `;
+
+              $(".raid").append(template);
+
+              $(".raid").hide().fadeIn('fast').delay(timeToShow).fadeOut('fast', function(){ 
+                $(".raidmessage").remove(); 
+              });
 
             });
           }

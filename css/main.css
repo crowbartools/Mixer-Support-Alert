@@ -26,13 +26,23 @@ html, body{
 	text-align:center;
 	box-shadow: 2px 2px 2px #888888;
 }
+.raid{
+	background-color:black;
+	width:100%;
+	height:100%;
+	position: relative;
+	display:none;
+}
 .raidmessage{
 	color:white;
 	text-align:center;
-	background-color:black;
 	border-radius: 5px;
 	margin:5px;
 	padding:7px;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
 }
 .raidmessage img{
 	width:125px;

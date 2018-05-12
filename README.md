@@ -8,9 +8,10 @@ Note this will not post anything in chat. So please use this in conjuction with 
 Usage: <br>
 1. Open up OBS. <br>
 2. Create a new browser overlay element. <br>
-3. Paste in http://firebottle.tv/projects/support-alert/support.html?username=YOURNAMEHERE&timer=8000&command=support <br>
+3. Paste in `http://crowbartools.com/projects/support-alert/support.html?username=YOURNAMEHERE&timer=8000&command=support&game=1` <br>
 4. Change out your name in the url.
 
 Settings: <br>
 1. You can change the timer to adjust how long the support popup shows. 1000 = 1 second. <br>
 2. You can change the command in the URL if your shoutout command isn't !support.
+3. You can choose if you want to show their last played game or not: game=1 or game=0.

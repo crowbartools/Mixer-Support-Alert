@@ -16,12 +16,40 @@ var getUrlParameter = function getUrlParameter(sParam) {
   }
 };
 
+// Headers for ajax calls.
+function setHeader(xhr) {
+  xhr.setRequestHeader('Client-ID', '8682f64ae59cbcba5cd701c205b54b04a424b46ca064e563');
+}
+
 // Get User ID & start it up
 var username = getUrlParameter('username');
-$.getJSON( "https://Mixer.com/api/v1/channels/"+username, function( data ) {
-  userID = data.id;
-  mixerSocketConnect();
-});
+$.ajax({
+  url: "https://Mixer.com/api/v1/channels/" + username,
+  type: 'GET',
+  dataType: 'json',
+  beforeSend: setHeader,
+  success: function(data) {
+      userID = data.id;
+      userPartner = data.partnered;
+      if (userPartner === true) {
+          subIcon = data.badge.url;
+      } else {
+          subIcon = "";
+      }
+
+      // Get our chat endpoints and connect to one.
+      $.ajax({
+          url: "https://Mixer.com/api/v1/chats/" + userID,
+          type: 'GET',
+          dataType: 'json',
+          beforeSend: setHeader,
+          success: function(data) {
+              var endpoints = data.endpoints
+              mixerSocketConnect(endpoints);
+          }
+      })
+  }
+})
 
 // General Settings
 var showTime = getUrlParameter('timer');
@@ -31,159 +59,170 @@ gameCheck = getUrlParameter('game');
 
 // CHAT
 // Connect to mixer Websocket
-function mixerSocketConnect(){
-  if ("WebSocket" in window){
+function mixerSocketConnect(endpoints) {
+  if ("WebSocket" in window) {
 
-     // Let us open a web socket
-     var ws = new ReconnectingWebSocket("wss://chat2-dal.Mixer.com:443");
+      // Let us open a web socket
+      var randomEndpoint = endpoints[Math.floor(Math.random() * endpoints.length)];
+      var ws = new ReconnectingWebSocket(randomEndpoint);
+      console.log('Connected to ' + randomEndpoint);
 
-     ws.onopen = function(){
-        // Web Socket is connected, send data using send()
-        var connector = JSON.stringify({type: "method", method: "auth", arguments: [userID], id: 1});
-        ws.send(connector);
-        console.log('Connection Opened...');
-        $("<div class='chatmessage' id='1'>Chat connection established to "+username+".</div>").appendTo(".chat").hide().fadeIn('fast').delay(5000).fadeOut('fast', function(){ $(this).remove(); });
-     
-        // Error Handling & Keep Alive
-        setInterval(function(){
-          errorHandle(ws);
-        }, 10000)
-     };
+      ws.onopen = function() {
+          // Web Socket is connected, send data using send()
+          var connector = JSON.stringify({
+              type: "method",
+              method: "auth",
+              arguments: [userID],
+              id: 1
+          });
+          ws.send(connector);
+          console.log('Connection Opened...');
+          $("<div class='chatmessage' id='1'>Chat connection established to " + username + ".</div>").appendTo(".chat").hide().fadeIn('fast').delay(5000).fadeOut('fast', function() {
+              $(this).remove();
+          });
 
-     ws.onmessage = function (evt){
-      chat(evt);
+          // Error Handling & Keep Alive
+          setInterval(function() {
+              errorHandle(ws);
+          }, 10000)
+      };
 
-      // Debug - Log all chat events.
-      //console.log(evt);
-     };
+      ws.onmessage = function(evt) {
+          chat(evt);
+      };
 
-     ws.onclose = function(){
-        // websocket is closed.
-        console.log("Connection is closed...");
-     };
+      ws.onclose = function() {
+          // websocket is closed.
+          console.log("Connection is closed...");
+      };
 
-  }else{
-     // The browser doesn't support WebSocket
-     console.error("Woah, something broke. Abandon ship!");
+  } else {
+      // The browser doesn't support WebSocket
+      console.error("Woah, something broke. Abandon ship!");
   }
 }
+
 // Chat Messages
-function chat(evt){
+function chat(evt) {
   var evtString = $.parseJSON(evt.data);
   var eventType = evtString.event;
   var eventMessage = evtString.data;
 
-  if (eventType == "ChatMessage"){
+  if (eventType == "ChatMessage") {
       var username = eventMessage.user_name;
       var userroles = eventMessage.user_roles[0];
-    var usermessage = eventMessage.message.message;
-    var messageID = eventMessage.id;
-    var completeMessage = "";
+      var usermessage = eventMessage.message.message;
+      var messageID = eventMessage.id;
+      var completeMessage = "";
       var usercommand = usermessage.data;
 
       $.each(usermessage, function() {
-        var type = this.type;
+          var type = this.type;
 
-        if (type == "text"){
-          var messageTextOrig =  this.data;
-          var messageText = messageTextOrig.replace(/(<([^>]+)>)/ig, "");
-          completeMessage += messageText;
-        } else if (type == "tag"){
-          var userTag = this.text;
-          completeMessage += userTag;
-        }
+          if (type == "text") {
+              var messageTextOrig = this.data;
+              var messageText = messageTextOrig.replace(/(<([^>]+)>)/ig, "");
+              completeMessage += messageText;
+          } else if (type == "tag") {
+              var userTag = this.text;
+              completeMessage += userTag;
+          }
 
       });
 
       // Make sure command came from a user or owner.
       // Then take thank name and post a message.
-      if(userroles == "Mod" && completeMessage.indexOf("!"+command) >= 0 || userroles == "ChannelEditor" && completeMessage.indexOf("!"+command) >= 0 || userroles == "Owner" && completeMessage.indexOf("!"+command) >= 0){
-        var raidEditOne = completeMessage.replace("!"+command, "");
-        var raidEditTwo = raidEditOne.replace("@","");
-        var raidEditFinal = $.trim(raidEditTwo);
+      if (userroles == "Mod" && completeMessage.indexOf("!" + command) >= 0 || userroles == "ChannelEditor" && completeMessage.indexOf("!" + command) >= 0 || userroles == "Owner" && completeMessage.indexOf("!" + command) >= 0) {
+          var raidEditOne = completeMessage.replace("!" + command, "");
+          var raidEditTwo = raidEditOne.replace("@", "");
+          var raidEditFinal = $.trim(raidEditTwo);
 
-        if(raidEditFinal !== undefined && raidEditFinal !== null && raidEditFinal !== ""){
-          $.getJSON( "https://Mixer.com/api/v1/channels/"+raidEditFinal, function( data ) {
-            var userID = data.id;
-            var userAvatar = data.user.avatarUrl;
-            var userGroups = data.user.groups;
-            var userGroup = "User";
-            var userGame = "";
-              
-            for(i in userGroups){
-              let group = userGroups[i];
-              let groupName = group.name;
-              
-              switch(groupName) {
-                case "Pro":
-                  userGroup = "Pro";
-                break;
-                case "Subscriber":
-                  userGroup = "Subscriber";
-                break;
-                case "Mod":
-                case "ChannelEditor":
-                case "Channel Editor":
-                  userGroup = "Mod";
-                break;
-                case "Staff":
-                  userGroup = "Staff";
-                break;
-                case "Owner":
-                  userGroup = "Owner";
-                break;
-                default:
-                  userGroup = "User";
-              }
+          if (raidEditFinal !== undefined && raidEditFinal !== null && raidEditFinal !== "") {
+              $.ajax({
+                  url: "https://Mixer.com/api/v1/channels/" + raidEditFinal,
+                  type: 'GET',
+                  dataType: 'json',
+                  beforeSend: setHeader,
+                  success: function(data) {
+                      var userID = data.id;
+                      var userAvatar = data.user.avatarUrl;
+                      var userGroups = data.user.groups;
+                      var userGroup = "User";
+                      var userGame = "";
 
-            }
+                      for (i in userGroups) {
+                          let group = userGroups[i];
+                          let groupName = group.name;
 
-            if(userAvatar == null || userAvatar == "null"){
-              var userAvatar = "http://Mixer.com/api/v1/users/62319/avatar?w=256&h=256&v=0";
-            }
-            if(gameCheck == 1 && data.type !== null){
-              var userGame = "They where last seen playing " + data.type.name;
-            }
+                          switch (groupName) {
+                              case "Pro":
+                                  userGroup = "Pro";
+                                  break;
+                              case "Subscriber":
+                                  userGroup = "Subscriber";
+                                  break;
+                              case "Mod":
+                              case "ChannelEditor":
+                              case "Channel Editor":
+                                  userGroup = "Mod";
+                                  break;
+                              case "Staff":
+                                  userGroup = "Staff";
+                                  break;
+                              case "Owner":
+                                  userGroup = "Owner";
+                                  break;
+                              default:
+                                  userGroup = "User";
+                          }
+                      }
 
-            let template = `
-            <div class='raidmessage'>
-              <div class='avatar'>
-                <img src="${userAvatar}">
-              </div>
-              <div class="username" role="${userGroup}">
-                ${raidEditFinal}
-              </div>
-                <div class="game">
-                  ${userGame}
-                </div>
-                <div class='mixerurl'>
-                mixer.com/${raidEditFinal}
-              </div>
-            </div>
-          `;
+                      if (userAvatar == null || userAvatar == "null") {
+                          var userAvatar = "http://mixer.com/api/v1/users/62319/avatar?w=256&h=256&v=0";
+                      }
 
-          $(".raid").append(template);
+                      if (gameCheck == 1 && data.type !== null) {
+                          var userGame = "They where last streaming " + data.type.name + '.';
+                      }
 
-          $(".raid").hide().fadeIn('fast').delay(timeToShow).fadeOut('fast', function(){ 
-            $(".raidmessage").remove(); 
-          });
+                      let template = `
+                        <div class='raidmessage'>
+                          <div class='avatar'>
+                            <img src="${userAvatar}">
+                          </div>
+                          <div class="username" role="${userGroup}">
+                            ${raidEditFinal}
+                          </div>
+                            <div class="game">
+                              ${userGame}
+                            </div>
+                            <div class='mixerurl'>
+                            mixer.com/${raidEditFinal}
+                          </div>
+                        </div>
+                      `;
 
-        });
+                      $(".raid").append(template);
+
+                      $(".raid").hide().fadeIn('fast').delay(timeToShow).fadeOut('fast', function() {
+                          $(".raidmessage").remove();
+                      });
+                  }
+              });
+          }
       }
-    }
-
-}
+  }
 }
 
 
 // Error Handling & Keep Alive
-function errorHandle(ws){
-var wsState = ws.readyState;
-if (wsState !== 1){
-// Connection not open.
-console.log('Ready State is '+wsState);
-} else {
-// Connection open, send keep alive.
-ws.send(2);
-}
+function errorHandle(ws) {
+  var wsState = ws.readyState;
+  if (wsState !== 1) {
+      // Connection not open.
+      console.log('Ready State is ' + wsState);
+  } else {
+      // Connection open, send keep alive.
+      ws.send(2);
+  }
 }

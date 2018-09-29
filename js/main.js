@@ -182,7 +182,7 @@ function chat(evt) {
                       }
 
                       if (gameCheck == 1 && data.type !== null) {
-                          var userGame = "They where last streaming " + data.type.name + '.';
+                          var userGame = "They were last streaming " + data.type.name + '.';
                       }
 
                       let template = `

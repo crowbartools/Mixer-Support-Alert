@@ -52,10 +52,9 @@ $.ajax({
 })
 
 // General Settings
-var showTime = getUrlParameter('timer');
-timeToShow = showTime; // in Milliseconds
-command = getUrlParameter('command');
-gameCheck = getUrlParameter('game');
+var timeToShow = getUrlParameter('timer'); // in Milliseconds
+var command = getUrlParameter('command');
+var gameCheck = getUrlParameter('game');
 
 // CHAT
 // Connect to mixer Websocket
@@ -77,9 +76,17 @@ function mixerSocketConnect(endpoints) {
           });
           ws.send(connector);
           console.log('Connection Opened...');
-          $("<div class='chatmessage' id='1'>Chat connection established to " + username + ".</div>").appendTo(".chat").hide().fadeIn('fast').delay(5000).fadeOut('fast', function() {
-              $(this).remove();
-          });
+          let template = `
+            <div class='raidmessage'>
+                <div class="username">
+                    Support overlay is ready!
+                </div>
+            </div>
+            `;
+            $(".raid").append(template);
+            $(".raid").hide().fadeIn('fast').delay(3000).fadeOut('fast', function() {
+                $(".raidmessage").remove();
+            });
 
           // Error Handling & Keep Alive
           setInterval(function() {
@@ -132,7 +139,7 @@ function chat(evt) {
 
       // Make sure command came from a user or owner.
       // Then take thank name and post a message.
-      if (userroles == "Mod" && completeMessage.indexOf("!" + command) >= 0 || userroles == "ChannelEditor" && completeMessage.indexOf("!" + command) >= 0 || userroles == "Owner" && completeMessage.indexOf("!" + command) >= 0) {
+      if (userroles == "Mod" && completeMessage.indexOf("!" + command + " ") >= 0 || userroles == "ChannelEditor" && completeMessage.indexOf("!" + command + " ") >= 0 || userroles == "Owner" && completeMessage.indexOf("!" + command + " ") >= 0) {
           var raidEditOne = completeMessage.replace("!" + command, "");
           var raidEditTwo = raidEditOne.replace("@", "");
           var raidEditFinal = $.trim(raidEditTwo);
@@ -197,16 +204,27 @@ function chat(evt) {
                               ${userGame}
                             </div>
                             <div class='mixerurl'>
-                            mixer.com/${raidEditFinal}
-                          </div>
+                                mixer.com/${raidEditFinal}
+                            </div>
                         </div>
                       `;
 
-                      $(".raid").append(template);
+                      $(".raid").html(template);
 
-                      $(".raid").hide().fadeIn('fast').delay(timeToShow).fadeOut('fast', function() {
-                          $(".raidmessage").remove();
+                      $(".raidmessage .username").fitText();
+                      $(".raidmessage .game").fitText(3);
+                      $(".raidmessage .mixerurl").fitText(3);
+
+                      
+                      $(".raid").fadeIn('fast', function(){
+                        $(window).trigger('resize');
                       });
+
+                      setTimeout(function(){
+                        $(".raid").fadeOut('fast', function() {
+                            $(".raidmessage").remove();
+                        }); 
+                      }, timeToShow);
                   }
               });
           }

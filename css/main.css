@@ -10,11 +10,9 @@ html, body{
 .wrapper{
 	position:relative;
 	font-family: ProximaNovaBold, Times New Roman, Verdana;
-	font-size:18pt;
+	font-size:20px;
 	overflow:hidden;
 	color:white;
-	height:100vh;
-	width:100vw;
 }
 .error{
 	width:500px;
@@ -27,11 +25,11 @@ html, body{
 	box-shadow: 2px 2px 2px #888888;
 }
 .raid{
+	width: 100%;
 	background-color:black;
-	width:100%;
-	height:100%;
 	position: relative;
 	display:none;
+	border-radius: 10px;
 }
 .raidmessage{
 	color:white;
@@ -39,18 +37,18 @@ html, body{
 	border-radius: 5px;
 	margin:5px;
 	padding:7px;
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
+	width: 100%;
 }
 .raidmessage img{
-	width:125px;
+	width: 50%;
 	border-radius: 60px;
 }
 .username{
 	text-transform: capitalize;
-	font-size:1.5em;
+	width:100%;
+}
+.game,.mixerurl{
+	width:100%;
 }
 
 
